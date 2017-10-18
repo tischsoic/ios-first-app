@@ -1,12 +1,5 @@
-//
-//  AppDelegate.swift
-//  a
-//
-//  Created by John Smith on 10/16/17.
-//  Copyright © 2017 John Smith. All rights reserved.
-//
-
 import UIKit
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
