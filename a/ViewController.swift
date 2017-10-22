@@ -25,19 +25,99 @@ class ViewController: UIViewController {
     @IBOutlet weak var previousButton: UIButton!
     
     @IBAction func saveButtonClicked(_ sender: Any) {
-        albums.append(AlbumRecord(performer: performerInput.text!, title: titleInput.text!, genre: genreInput.text!, publicationYear: publicationYearInput.text!, tracksNumber: tracksNumberInput.text!))
+        let album = AlbumRecord(performer: performerInput.text!, title: titleInput.text!, genre: genreInput.text!, publicationYear: publicationYearInput.text!, tracksNumber: tracksNumberInput.text!)
+        var goToRecord = 0
         
-            showRecord(newRecord: false, recordNumber: lastViewRecord != nil ? lastViewRecord! : 0)
+        if (currentRecordIndex! == -1) {
+            albums.append(album)
+            goToRecord = lastViewedRecord != nil ? lastViewedRecord! : 0
+        } else if let index = currentRecordIndex {
+            albums[index] = album
+            goToRecord = index
+        }
+        
+        showRecord(recordIndex: goToRecord)
     }
     
+    @IBAction func previousButtonClicked(_ sender: Any) {
+        if (currentRecordIndex == nil) {
+            return
+        }
+        if (currentRecordIndex! > 0) {
+            showRecord(recordIndex: currentRecordIndex! - 1)
+        } else if (currentRecordIndex! == -1) {
+            showRecord(recordIndex: lastViewedRecord != nil ? lastViewedRecord! : 0)
+        }
+    }
+    
+    @IBAction func nexButtonClicked(_ sender: Any) {
+        if (currentRecordIndex == nil) {
+            return
+        }
+        if (currentRecordIndex! < albums.count - 1) {
+            showRecord(recordIndex: currentRecordIndex! + 1)
+        } else if (currentRecordIndex! == albums.count - 1) {
+            showRecord(recordIndex: -1)
+        }
+    }
+    
+    @IBAction func newRecordButtonClicked(_ sender: Any) {
+        if (currentRecordIndex != nil && currentRecordIndex! == -1) {
+            return
+        }
+        
+        showRecord(recordIndex: -1)
+    }
+    
+    @IBAction func deleteButtonClicked(_ sender: Any) {
+        if (currentRecordIndex == nil) {
+            return
+        }
+        
+        if (currentRecordIndex! == -1) {
+            showRecord(recordIndex: lastViewedRecord != nil ? lastViewedRecord! : 0)
+        } else {
+            albums.remove(at: currentRecordIndex!)
+            showRecord(recordIndex: lastViewedRecord != nil ? lastViewedRecord! : 0)        }
+    }
+    
+    @IBAction func performerEditingDidBegin(_ sender: Any) {
+        saveButton.isEnabled = true
+    }
+    
+    @IBAction func titleEditingDidBegin(_ sender: Any) {
+        saveButton.isEnabled = true
+    }
+    
+    @IBAction func genreEditingDidBegin(_ sender: Any) {
+        saveButton.isEnabled = true
+    }
+    
+    @IBAction func yearEditingDidBegin(_ sender: Any) {
+        saveButton.isEnabled = true
+    }
+    
+    @IBAction func tracksNumberEditingDidBegin(_ sender: Any) {
+        saveButton.isEnabled = true
+    }
+    
+    
     var albums: [AlbumRecord] = []
-    var lastViewRecord: Int? = nil
+    var currentRecordIndex: Int? = nil
+    var lastViewedRecord: Int? = nil
     
     let defaultSession = URLSession(configuration: URLSessionConfiguration.default)
     var albumsLoadDataTask: URLSessionDataTask?
     
-    func showRecord(newRecord: Bool, recordNumber: Int?) {
-        if newRecord {
+    func showRecord(recordIndex: Int) {
+        if (currentRecordIndex != nil && currentRecordIndex! != -1) {
+            lastViewedRecord = currentRecordIndex!
+        }
+        let recordExists = recordIndex < albums.count && recordIndex >= 0
+        currentRecordIndex = recordIndex
+        
+        if !recordExists {
+            currentRecordIndex = -1
             performerInput.text = ""
             titleInput.text = ""
             genreInput.text = ""
@@ -49,9 +129,9 @@ class ViewController: UIViewController {
             saveButton.isEnabled = true
             deleteButton.isEnabled = true
             nextButton.isEnabled = false
-            previousButton.isEnabled = false
+            previousButton.isEnabled = albums.count != 0
         } else {
-            let album = albums[recordNumber!]
+            let album = albums[recordIndex]
             
             performerInput.text = album.performer
             titleInput.text = album.title
@@ -59,14 +139,19 @@ class ViewController: UIViewController {
             publicationYearInput.text = album.publicationYear
             tracksNumberInput.text = album.tracksNumber
             
-            mainLabel.text = "Rekord " + String(recordNumber!) + " z " + String(albums.count);
+            mainLabel.text = "Rekord " + String(recordIndex + 1) + " z " + String(albums.count);
             newRecordButton.isEnabled = true
             saveButton.isEnabled = false
             deleteButton.isEnabled = true
-            nextButton.isEnabled = false
-            previousButton.isEnabled = false
-
+            nextButton.isEnabled = true
+            previousButton.isEnabled = recordIndex != 0
         }
+        
+        performerInput.resignFirstResponder()
+        titleInput.resignFirstResponder()
+        genreInput.resignFirstResponder()
+        publicationYearInput.resignFirstResponder()
+        tracksNumberInput.resignFirstResponder()
     }
     
     func loadAlbums() {
@@ -82,16 +167,24 @@ class ViewController: UIViewController {
             
             if let data = data {
                 do {
+                    print(data)
                 let res = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions(rawValue:0)) as! [AnyObject]
                 
                 for item in res{
+                    if (item is NSNull) {
+                        continue
+                    }
                     var newAlbum = AlbumRecord()
-                    newAlbum.title = item["title"] as? String
+                    newAlbum.title = item["album"] as! String
+                    newAlbum.genre = item["genre"] as! String
+                    newAlbum.performer = item["artist"] as! String
+                    newAlbum.publicationYear = String(item["year"] as! Int)
+                    newAlbum.tracksNumber = String(item["tracks"] as! Int)
                     self.albums.append(newAlbum)
                 }
                 
                 DispatchQueue.main.async {
-                    self.showRecord(newRecord: false, recordNumber: 0)
+                    self.showRecord(recordIndex: 0)
                 }
                 } catch let error as NSError{
                     print("The error in the catch block is \(error)")
@@ -110,9 +203,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        showRecord(recordIndex: -1)
         loadAlbums()
-        mainLabel.text = "Nowy rekord"
-        
     }
 
     override func didReceiveMemoryWarning() {
