@@ -14,6 +14,7 @@
 		5267BB941F950C7400261755 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5267BB921F950C7400261755 /* LaunchScreen.storyboard */; };
 		5267BB9F1F950C7400261755 /* aTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267BB9E1F950C7400261755 /* aTests.swift */; };
 		5267BBAA1F950C7400261755 /* aUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267BBA91F950C7400261755 /* aUITests.swift */; };
+		ACE4FE161FA0DE0800C2B29D /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ACE4FE151FA0DE0800C2B29D /* MapKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		5267BBA51F950C7400261755 /* aUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = aUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5267BBA91F950C7400261755 /* aUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = aUITests.swift; sourceTree = "<group>"; };
 		5267BBAB1F950C7400261755 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		ACE4FE151FA0DE0800C2B29D /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACE4FE161FA0DE0800C2B29D /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,6 +84,7 @@
 				5267BB9D1F950C7400261755 /* aTests */,
 				5267BBA81F950C7400261755 /* aUITests */,
 				5267BB871F950C7400261755 /* Products */,
+				ACE4FE141FA0DE0800C2B29D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -123,6 +127,14 @@
 				5267BBAB1F950C7400261755 /* Info.plist */,
 			);
 			path = aUITests;
+			sourceTree = "<group>";
+		};
+		ACE4FE141FA0DE0800C2B29D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				ACE4FE151FA0DE0800C2B29D /* MapKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -194,6 +206,11 @@
 					5267BB851F950C7400261755 = {
 						CreatedOnToolsVersion = 8.3.3;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Maps.iOS = {
+								enabled = 0;
+							};
+						};
 					};
 					5267BB991F950C7400261755 = {
 						CreatedOnToolsVersion = 8.3.3;
@@ -413,6 +430,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = a/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = a.a;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -425,6 +443,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = a/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = a.a;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -505,6 +524,7 @@
 				5267BBB01F950C7400261755 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5267BBB11F950C7400261755 /* Build configuration list for PBXNativeTarget "aTests" */ = {
 			isa = XCConfigurationList;
@@ -513,6 +533,7 @@
 				5267BBB31F950C7400261755 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5267BBB41F950C7400261755 /* Build configuration list for PBXNativeTarget "aUITests" */ = {
 			isa = XCConfigurationList;
@@ -521,6 +542,7 @@
 				5267BBB61F950C7400261755 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
