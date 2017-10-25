@@ -1,12 +1,5 @@
 import UIKit
 
-struct AlbumRecord {
-    var performer = ""
-    var title = ""
-    var genre = ""
-    var publicationYear = ""
-    var tracksNumber = ""
-}
 
 class ViewController: UIViewController {
     
@@ -102,7 +95,7 @@ class ViewController: UIViewController {
     }
     
     
-    var albums: [AlbumRecord] = []
+    
     var currentRecordIndex: Int? = nil
     var lastViewedRecord: Int? = nil
     
@@ -180,7 +173,7 @@ class ViewController: UIViewController {
                     newAlbum.performer = item["artist"] as! String
                     newAlbum.publicationYear = String(item["year"] as! Int)
                     newAlbum.tracksNumber = String(item["tracks"] as! Int)
-                    self.albums.append(newAlbum)
+                    albums.append(newAlbum)
                 }
                 
                 DispatchQueue.main.async {
