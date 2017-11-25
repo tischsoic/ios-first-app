@@ -1,5 +1,10 @@
 import UIKit
 
+class AlbumTableViewCell: UITableViewCell {
+    @IBOutlet weak var title: UILabel!
+    @IBOutlet weak var year: UILabel!
+    @IBOutlet weak var performer: UILabel!
+}
 
 class ViewController: UIViewController {
     

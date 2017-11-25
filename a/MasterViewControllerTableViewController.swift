@@ -10,11 +10,38 @@ import UIKit
 
 var albums: [AlbumRecord] = []
 
+protocol AlbumSelectionDelegate: class {
+    func selectAlbum(albumIndex: Int)
+}
+
 class MasterViewControllerTableViewController: UITableViewController {
 
+    weak var delegate: AlbumSelectionDelegate?
+    
+    @IBAction func addAlbum(_ sender: Any) {
+        var newAlbum = AlbumRecord()
+        newAlbum.title = ""
+        newAlbum.genre = ""
+        newAlbum.performer = ""
+        newAlbum.publicationYear = ""
+        newAlbum.tracksNumber = ""
+        albums.append(newAlbum)
+        
+        self.tableView.reloadData()
+        
+        self.delegate?.selectAlbum(albumIndex: albums.count - 1)
+        
+        if let detailViewController = self.delegate as? DetailTableViewController {
+            splitViewController?.showDetailViewController(detailViewController, sender: nil)
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        //navigationController?.
+        
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -39,15 +66,29 @@ class MasterViewControllerTableViewController: UITableViewController {
         return albums.count
     }
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        cell.textLabel?.text = albums[indexPath.row].title
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> AlbumTableViewCell {
+        let albumCell = tableView.dequeueReusableCell(withIdentifier: "AlbumCell", for: indexPath) as! AlbumTableViewCell
+        
+        albumCell.title?.text = albums[indexPath.row].title
+        albumCell.year?.text = albums[indexPath.row].publicationYear
+        albumCell.performer?.text = albums[indexPath.row].performer
 
-        // Configure the cell...
-
-        return cell
+        return albumCell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.delegate?.selectAlbum(albumIndex: indexPath.row)
+        
+        if let detailViewController = self.delegate as? DetailTableViewController {
+            splitViewController?.showDetailViewController(detailViewController, sender: nil)
+        }
     }
 
+    //override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
+       // let selectedAlbum = albums[indexPath.row]
+       // self.delegate?.selectAlbum(album: selectedAlbum, index: indexPath.row)
+   // }
+    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

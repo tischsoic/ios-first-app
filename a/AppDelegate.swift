@@ -2,12 +2,76 @@ import UIKit
 
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
     var window: UIWindow?
 
+    let defaultSession = URLSession(configuration: URLSessionConfiguration.default)
+    var albumsLoadDataTask: URLSessionDataTask?
+    
+    var masterViewControllerTableView: UITableView?
+    
+    func loadAlbums() {
+        let url = URL(string: "https://isebi.net/albums.php")
+        let urlRequest = URLRequest(url: url!)
+        
+        print("load albums")
+        albumsLoadDataTask = defaultSession.dataTask(with: urlRequest, completionHandler: {
+            (data, response, error) in
+            if let error = error {
+                print(error.localizedDescription)
+            }
+            
+            if let data = data {
+                do {
+                    print(data)
+                    let res = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions(rawValue:0)) as! [AnyObject]
+                    
+                    for item in res{
+                        if (item is NSNull) {
+                            continue
+                        }
+                        var newAlbum = AlbumRecord()
+                        newAlbum.title = item["album"] as! String
+                        newAlbum.genre = item["genre"] as! String
+                        newAlbum.performer = item["artist"] as! String
+                        newAlbum.publicationYear = String(item["year"] as! Int)
+                        newAlbum.tracksNumber = String(item["tracks"] as! Int)
+                        albums.append(newAlbum)
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self.masterViewControllerTableView?.reloadData()
+                    }
+                } catch let error as NSError{
+                    print("The error in the catch block is \(error)")
+                }
+                catch
+                {
+                    print("Catch Block")
+                }
+            }
+            
+        })
+        
+        albumsLoadDataTask?.resume()
+    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        loadAlbums();
+        
+        let splitViewController = window!.rootViewController as! UISplitViewController
+        splitViewController.delegate = self
+        
+        let leftNavigationController = splitViewController.viewControllers.first as! UINavigationController
+        let masterViewController = leftNavigationController.topViewController as! MasterViewControllerTableViewController
+        let rightNavigationController = splitViewController.viewControllers.last as! UINavigationController
+        let detailViewController = rightNavigationController.topViewController as! DetailTableViewController
+        
+        self.masterViewControllerTableView = masterViewController.tableView
+        masterViewController.delegate = detailViewController
+        detailViewController.masterViewController = masterViewController
+        
         // Override point for customization after application launch.
         return true
     }
@@ -33,7 +97,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
-
+    
+    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController:UIViewController, onto primaryViewController:UIViewController) -> Bool {
+        guard let secondaryAsNavController = secondaryViewController as? UINavigationController else { return false }
+        guard let topAsDetailController = secondaryAsNavController.topViewController as? DetailTableViewController else { return false }
+        if topAsDetailController.albumIndex == nil {
+            // Return true to indicate that we have handled the collapse by doing nothing; the secondary controller will be discarded.
+            return true
+        }
+        return false
+    }
 }
-
