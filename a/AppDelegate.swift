@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
                         if (item is NSNull) {
                             continue
                         }
-                        var newAlbum = AlbumRecord()
+                        let newAlbum = AlbumRecord()
                         newAlbum.title = item["album"] as! String
                         newAlbum.genre = item["genre"] as! String
                         newAlbum.performer = item["artist"] as! String
@@ -56,10 +56,45 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         albumsLoadDataTask?.resume()
     }
+    
+    func getAlbumsFilePath() -> String {
+        let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        let docsDir = dirPaths.first
+        let albumFilePath = docsDir! + "/" + "albums"
+        
+        return albumFilePath
+    }
+    
+    func albumsFileExists() -> Bool {
+        let fileManager = FileManager.default
+        let albumsFilePath = getAlbumsFilePath()
+        
+        return fileManager.fileExists(atPath: albumsFilePath)
+    }
+    
+    func saveAlbumsToFile() {
+        let albumsFilePath = getAlbumsFilePath()
+        NSKeyedArchiver.archiveRootObject(albums, toFile: albumsFilePath)
+    }
+    
+    func getAlbumsFromFile() -> [AlbumRecord] {
+        let albumsFilePath = getAlbumsFilePath()
+        
+        if let albums = NSKeyedUnarchiver.unarchiveObject(withFile: albumsFilePath) as? [AlbumRecord] {
+            return albums
+        } else {
+            return []
+        }
+    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        loadAlbums();
         
+        if (albumsFileExists()) {
+            albums = getAlbumsFromFile()
+        } else {
+            loadAlbums();
+        }
+            
         let splitViewController = window!.rootViewController as! UISplitViewController
         splitViewController.delegate = self
         
@@ -83,6 +118,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
+        saveAlbumsToFile()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -95,6 +132,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+        
+        saveAlbumsToFile()
     }
     
     func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController:UIViewController, onto primaryViewController:UIViewController) -> Bool {
