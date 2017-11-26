@@ -72,7 +72,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         masterViewController.delegate = detailViewController
         detailViewController.masterViewController = masterViewController
         
-        // Override point for customization after application launch.
         return true
     }
 
@@ -102,7 +101,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         guard let secondaryAsNavController = secondaryViewController as? UINavigationController else { return false }
         guard let topAsDetailController = secondaryAsNavController.topViewController as? DetailTableViewController else { return false }
         if topAsDetailController.albumIndex == nil {
-            // Return true to indicate that we have handled the collapse by doing nothing; the secondary controller will be discarded.
             return true
         }
         return false
